@@ -3,17 +3,14 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     HOST: str
-    TTS_PORT: int
-    WS_PATH: str
-    TTS_MODEL_NAME: str
-    CHUNK_MS: int
-    GENERATION_TIMEOUT: int
-    SAMPLE_RATE: int
+    ASR_PORT: int
+    ASR_MODEL_NAME: str
     LOG_LEVEL: str
     LOG_DIR: str
     LOG_FILE_INFO: str
     LOG_FILE_ERROR: str
-    RECIEVE_TIMEOUT: float
+    MAX_DUARTION: int
+    REQUEST_TIMEOUT: float
 
     class Config:
         env_file = ".env"
