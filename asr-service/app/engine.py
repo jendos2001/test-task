@@ -14,7 +14,7 @@ class ASREngine:
     def _load(self):
         self.logger.info(event="ASR load start", model=self.model_name)
         model = whisper.load_model(self.model_name, device="cpu")
-        self.logger.info(event="TTS load done", model=self.model_name)
+        self.logger.info(event="ASR load done", model=self.model_name)
         return model
 
     def transcribe_from_pcm(self, pcm_bytes: bytes, sample_rate: int, channels: int, lang: str = "en") -> dict:
@@ -42,8 +42,8 @@ class ASREngine:
                 raise
 
         result = self.model.transcribe(audio, language=lang, fp16=False)
-
-        if hasattr(result, "segments"):
+        
+        if "segments" in result.keys():
             segments = result["segments"]
             out = [
                 {
