@@ -71,10 +71,6 @@ async def websocket_tts(ws: WebSocket):
         logger.info(event="WebSocket closed", path=settings.WS_PATH)
 
 
-# @app.get('/hello')
-# def hello():
-#     return {'status': 'ok'}
-
 if __name__ == "__main__":
     import uvicorn
 
