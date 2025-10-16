@@ -6,7 +6,7 @@ from TTS.api import TTS
 from .logger import MyLogger
 
 
-class TtsEngine:
+class TTSEngine:
     def __init__(self, model_name: str, logger: MyLogger, sample_rate: int, chunk_ms: int):
         self.model_name = model_name
         self.logger = logger

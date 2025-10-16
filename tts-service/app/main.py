@@ -6,11 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings
 from .logger import MyLogger
-from .engine import TtsEngine
+from .engine import TTSEngine
 
 settings = Settings()
 logger = MyLogger(settings.LOG_DIR, settings.LOG_FILE_INFO, settings.LOG_FILE_ERROR, settings.LOG_LEVEL)
-tts_engine = TtsEngine(settings.MODEL_NAME, logger, settings.SAMPLE_RATE, settings.CHUNK_MS)
+tts_engine = TTSEngine(settings.TTS_MODEL_NAME, logger, settings.SAMPLE_RATE, settings.CHUNK_MS)
 
 
 app = FastAPI(title="tts-service", version="0.1.0")
@@ -71,8 +71,12 @@ async def websocket_tts(ws: WebSocket):
         logger.info(event="WebSocket closed", path=settings.WS_PATH)
 
 
+# @app.get('/hello')
+# def hello():
+#     return {'status': 'ok'}
+
 if __name__ == "__main__":
     import uvicorn
 
-    logger.info(event="Server start", host=settings.HOST, port=settings.PORT, ws_path=settings.WS_PATH)
-    uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, log_level="info")
+    logger.info(event="TTS server start", host=settings.HOST, port=settings.TTS_PORT, ws_path=settings.WS_PATH)
+    uvicorn.run("app.main:app", host=settings.HOST, port=settings.TTS_PORT, log_level="info")

@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     HOST: str
-    PORT: int
+    TTS_PORT: int
     WS_PATH: str
-    MODEL_NAME: str
+    TTS_MODEL_NAME: str
     CHUNK_MS: int
     GENERATION_TIMEOUT: int
     SAMPLE_RATE: int
