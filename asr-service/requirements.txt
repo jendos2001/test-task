@@ -1,0 +1,7 @@
+fastapi==0.119.0
+numpy==2.3.3
+scipy==1.16.2
+openai_whisper==20250625
+pydantic_settings==2.11.0
+Requests==2.32.5
+uvicorn==0.37.0
