@@ -1,5 +1,6 @@
 import asyncio
 import json
+import uvicorn
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -72,7 +73,5 @@ async def websocket_tts(ws: WebSocket):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     logger.info(event="TTS server start", host=settings.HOST, port=settings.TTS_PORT, ws_path=settings.WS_PATH)
     uvicorn.run("app.main:app", host=settings.HOST, port=settings.TTS_PORT, log_level="info")
