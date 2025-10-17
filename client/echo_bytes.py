@@ -26,6 +26,8 @@ try:
     for i, chunk in enumerate(resp.iter_content(chunk_size=4096)):
         if chunk:
             if isinstance(chunk, bytes):
+                if len(chunk) % 2 != 0:
+                    chunk = chunk[:len(chunk) - (len(chunk) % 2)]
                 pcm_chunks.append(np.frombuffer(chunk, dtype=np.int16))
                 print(f"Received chunk {i}, {len(chunk)} bytes")
 except requests.exceptions.ChunkedEncodingError as e:
