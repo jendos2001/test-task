@@ -1,5 +1,19 @@
 
 services:
+  gateway:
+    build: 
+      context: ./gateway
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - HOST=${HOST}
+      - GATEWAY_PORT=${GATEWAY_PORT}
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      - asr
+      - tts
+    restart: unless-stopped
   tts:
     build:
       context: ./tts-service
