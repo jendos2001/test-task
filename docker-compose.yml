@@ -6,8 +6,11 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - HOST=${HOST}
+      - TTS_PORT=${TTS_PORT}
     ports:
-      - "8082:8082"
+      - "${TTS_PORT}:${TTS_PORT}"
     volumes:
       - models_tts:/opt/models
     restart: unless-stopped
@@ -18,8 +21,11 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - HOST=${HOST}
+      - ASR_PORT=${ASR_PORT}
     ports:
-      - "8000:8000"
+      - "${ASR_PORT}:${ASR_PORT}"
     volumes:
       - models_asr:/opt/models
     restart: unless-stopped

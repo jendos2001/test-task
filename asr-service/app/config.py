@@ -2,8 +2,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    HOST: str
-    ASR_PORT: int
     ASR_MODEL_NAME: str
     LOG_LEVEL: str
     LOG_DIR: str

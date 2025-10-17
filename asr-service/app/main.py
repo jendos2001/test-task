@@ -60,7 +60,4 @@ async def stt_bytes(
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     logger.info(event="ASR server start", host=settings.HOST, port=settings.ASR_PORT)
-    uvicorn.run("app.main:app", host=settings.HOST, port=settings.ASR_PORT, log_level="info")
