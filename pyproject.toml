@@ -1,0 +1,11 @@
+[tool.ruff]
+
+select = ["E", "F", "W", "C90"]
+# Длинные строки
+ignore = ["E501"]
+
+fix = true
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]

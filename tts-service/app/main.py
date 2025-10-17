@@ -9,8 +9,15 @@ from .logger import MyLogger
 from .engine import TTSEngine
 
 settings = Settings()
-logger = MyLogger(settings.LOG_DIR, settings.LOG_FILE_INFO, settings.LOG_FILE_ERROR, settings.LOG_LEVEL)
-tts_engine = TTSEngine(settings.TTS_MODEL_NAME, logger, settings.SAMPLE_RATE, settings.CHUNK_MS)
+logger = MyLogger(
+    settings.LOG_DIR,
+    settings.LOG_FILE_INFO,
+    settings.LOG_FILE_ERROR,
+    settings.LOG_LEVEL,
+)
+tts_engine = TTSEngine(
+    settings.TTS_MODEL_NAME, logger, settings.SAMPLE_RATE, settings.CHUNK_MS
+)
 
 
 app = FastAPI(title="tts-service", version="0.1.0")
@@ -18,12 +25,15 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
+
 @app.websocket(settings.WS_PATH)
 async def websocket_tts(ws: WebSocket):
     await ws.accept()
     logger.info(event="WebSocket connected", path=settings.WS_PATH)
     try:
-        raw = await asyncio.wait_for(ws.receive_text(), timeout=settings.RECIEVE_TIMEOUT)
+        raw = await asyncio.wait_for(
+            ws.receive_text(), timeout=settings.RECIEVE_TIMEOUT
+        )
         try:
             payload = json.loads(raw)
         except json.JSONDecodeError:
@@ -42,9 +52,11 @@ async def websocket_tts(ws: WebSocket):
             return
 
         try:
-            async for chunk in tts_engine.synthesize_sentences(text, settings.GENERATION_TIMEOUT):
+            async for chunk in tts_engine.synthesize_sentences(
+                text, settings.GENERATION_TIMEOUT
+            ):
                 await ws.send_bytes(chunk)
-            await ws.send_text(json.dumps({"type": "end"})) # Завершаем стрим
+            await ws.send_text(json.dumps({"type": "end"}))  # Завершаем стрим
             logger.info(event="Stream complete")
         except asyncio.TimeoutError:
             await ws.send_text(json.dumps({"error": "Generation timeout"}))
@@ -72,4 +84,9 @@ async def websocket_tts(ws: WebSocket):
 
 
 if __name__ == "__main__":
-    logger.info(event="TTS server start", host=settings.HOST, port=settings.TTS_PORT, ws_path=settings.WS_PATH)
+    logger.info(
+        event="TTS server start",
+        host=settings.HOST,
+        port=settings.TTS_PORT,
+        ws_path=settings.WS_PATH,
+    )

@@ -7,7 +7,9 @@ from .logger import MyLogger
 
 
 class TTSEngine:
-    def __init__(self, model_name: str, logger: MyLogger, sample_rate: int, chunk_ms: int):
+    def __init__(
+        self, model_name: str, logger: MyLogger, sample_rate: int, chunk_ms: int
+    ):
         self.model_name = model_name
         self.logger = logger
         self.chunk_ms = chunk_ms
@@ -21,7 +23,7 @@ class TTSEngine:
         return model
 
     async def synthesize_sentences(self, text: str, timeout: int):
-        sentences = [s.strip() for s in text.strip().split('.') if s.strip()]
+        sentences = [s.strip() for s in text.strip().split(".") if s.strip()]
         chunk_samples = int(self.sample_rate * (self.chunk_ms / 1000.0))
 
         for index, sentence in enumerate(sentences):
@@ -29,8 +31,8 @@ class TTSEngine:
                 coroutine = asyncio.to_thread(self._tts.tts, text=sentence)
                 raw_audio = await asyncio.wait_for(coroutine, timeout=timeout)
                 arr = np.asarray(raw_audio)
-                arr = np.clip(arr, -1.0, 1.0) # Убираем шумы
-                values = (arr * (2 ** 15 - 1)).astype(np.int16)
+                arr = np.clip(arr, -1.0, 1.0)  # Убираем шумы
+                values = (arr * (2**15 - 1)).astype(np.int16)
                 total = len(values)
                 pos = 0
 
@@ -42,6 +44,14 @@ class TTSEngine:
                     pos = end
 
             except asyncio.TimeoutError:
-                self.logger.error(event="TTS generation timeout", sentence_index=index, sentence=sentence)
+                self.logger.error(
+                    event="TTS generation timeout",
+                    sentence_index=index,
+                    sentence=sentence,
+                )
             except Exception as exception:
-                self.logger.error(event="TTS generation error", sentence_inedx=index, error=str(exception))
+                self.logger.error(
+                    event="TTS generation error",
+                    sentence_inedx=index,
+                    error=str(exception),
+                )

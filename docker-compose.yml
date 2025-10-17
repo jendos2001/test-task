@@ -4,10 +4,17 @@ services:
     build: 
       context: ./gateway
       dockerfile: Dockerfile
-    env_file: .env
+    container_name: gateway
+    networks:
+      - speech_net
+    volumes:
+      - logs:/var/log/app
+    env_file: 
+      - .env
     environment:
       - HOST=${HOST}
       - GATEWAY_PORT=${GATEWAY_PORT}
+      - LOG_DIR=/var/log/app
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     depends_on:
@@ -18,21 +25,31 @@ services:
     build:
       context: ./tts-service
       dockerfile: Dockerfile
+    networks:
+      - speech_net
+    volumes:
+      - models_tts:/opt/models
+      - logs:/var/log/app
     env_file:
       - .env
     environment:
       - HOST=${HOST}
       - TTS_PORT=${TTS_PORT}
+      - LOG_DIR=/var/log/app
     ports:
       - "${TTS_PORT}:${TTS_PORT}"
-    volumes:
-      - models_tts:/opt/models
     restart: unless-stopped
 
   asr:
     build: 
       context: ./asr-service
       dockerfile: Dockerfile
+    container_name: asr
+    networks:
+      - speech_net
+    volumes:
+      - models_asr:/opt/models
+      - logs:/var/log/app
     env_file:
       - .env
     environment:
@@ -40,15 +57,15 @@ services:
       - ASR_PORT=${ASR_PORT}
     ports:
       - "${ASR_PORT}:${ASR_PORT}"
-    volumes:
-      - models_asr:/opt/models
     restart: unless-stopped
 
 
-  
+networks:
+  speech_net:
+    driver: bridge
+
 
 volumes:
-  models_tts:
-    name: models_tts
   models_asr:
-    name: models_asr
+  models_tts:
+  logs:

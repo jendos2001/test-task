@@ -17,7 +17,9 @@ class ASREngine:
         self.logger.info(event="ASR load done", model=self.model_name)
         return model
 
-    def transcribe_from_pcm(self, pcm_bytes: bytes, sample_rate: int, channels: int, lang: str = "en") -> dict:
+    def transcribe_from_pcm(
+        self, pcm_bytes: bytes, sample_rate: int, channels: int, lang: str = "en"
+    ) -> dict:
         arr = np.frombuffer(pcm_bytes, dtype=np.int16)
 
         # Пробуем преобразовать в моно, если многоканальная
@@ -25,8 +27,10 @@ class ASREngine:
             try:
                 arr = arr.reshape(-1, channels)
                 arr = arr.mean(axis=1).astype(np.int16)
-            except Exception as e:
-                self.logger.error(event="Failed to process multi-channel audio to mono-channel audio")
+            except Exception:
+                self.logger.error(
+                    event="Failed to process multi-channel audio to mono-channel audio"
+                )
                 raise
 
         audio = arr.astype(np.float32) / 32768.0
@@ -37,12 +41,14 @@ class ASREngine:
                 self.logger.info(event=f"Resampling from {sample_rate}Hz to 16000Hz")
                 audio = resample_poly(audio, 16000, sample_rate)
                 sample_rate = 16000
-            except Exception as e:
-                self.logger.error(event=f"Resampling from {sample_rate}Hz to 16000Hz failed")
+            except Exception:
+                self.logger.error(
+                    event=f"Resampling from {sample_rate}Hz to 16000Hz failed"
+                )
                 raise
 
         result = self.model.transcribe(audio, language=lang, fp16=False)
-        
+
         if "segments" in result.keys():
             segments = result["segments"]
             out_text = [

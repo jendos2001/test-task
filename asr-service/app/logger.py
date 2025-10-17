@@ -17,24 +17,34 @@ class MyLogger:
         if not self.logger.handlers:
             info_hdl = logging.StreamHandler()
             info_hdl.setLevel(logging.INFO)
-            info_hdl.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            info_hdl.setFormatter(
+                logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+            )
             self.logger.addHandler(info_hdl)
 
             err_hdl = logging.StreamHandler()
             err_hdl.setLevel(logging.ERROR)
-            err_hdl.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            err_hdl.setFormatter(
+                logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+            )
             self.logger.addHandler(err_hdl)
 
             os.makedirs(self.log_dir, exist_ok=True)
-            
+
             info_file = RotatingFileHandler(os.path.join(self.log_dir, self.info_file))
             info_file.setLevel(logging.INFO)
-            info_file.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            info_file.setFormatter(
+                logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+            )
             self.logger.addHandler(info_file)
 
-            error_file = RotatingFileHandler(os.path.join(self.log_dir, self.error_file))
+            error_file = RotatingFileHandler(
+                os.path.join(self.log_dir, self.error_file)
+            )
             error_file.setLevel(logging.ERROR)
-            error_file.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            error_file.setFormatter(
+                logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+            )
             self.logger.addHandler(error_file)
 
     def info(self, **kwargs):
