@@ -19,8 +19,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 @app.post("/api/stt/bytes")
 async def stt_bytes(
     request: Request,
-    sample_rate: int = Query(..., description="Sample rate"),
-    channels: int = Query(..., description="Channels"),
+    sr: int = Query(..., description="Sample rate"),
+    ch: int = Query(..., description="Channels"),
     lang: str = Query("en", description="Language (optional)"),
 ):
     try:
@@ -35,15 +35,15 @@ async def stt_bytes(
 
 
     bytes_per_sample = 2
-    total_samples = len(body) / (bytes_per_sample * max(1, channels))
-    duration_s = total_samples / sample_rate
+    total_samples = len(body) / (bytes_per_sample * max(1, ch))
+    duration_s = total_samples / sr
     if duration_s > settings.MAX_DUARTION:
         logger.error(event=f"Audio too long: {duration_s}s > {settings.MAX_DUARTION}s")
         raise HTTPException(status_code=413, detail=f"Audio too long: {duration_s:.2f}s > {settings.MAX_DUARTION}s")
 
     try:
         loop = asyncio.get_event_loop()
-        coro = loop.run_in_executor(None, asr_engine.transcribe_from_pcm, body, sample_rate, channels, lang)
+        coro = loop.run_in_executor(None, asr_engine.transcribe_from_pcm, body, sr, ch, lang)
         res = await asyncio.wait_for(coro, timeout=settings.REQUEST_TIMEOUT)
     except asyncio.TimeoutError:
         logger.error(event="Transcription timeout")
