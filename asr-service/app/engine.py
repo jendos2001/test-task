@@ -45,7 +45,7 @@ class ASREngine:
         
         if "segments" in result.keys():
             segments = result["segments"]
-            out = [
+            out_text = [
                 {
                     "start_ms": int(segment["start"] * 1000),
                     "end_ms": int(segment["end"] * 1000),
@@ -53,6 +53,7 @@ class ASREngine:
                 }
                 for segment in segments
             ]
+            out = {"segments": out_text}
         else:
             out = {"text": result.get("text", "").strip()}
         return out

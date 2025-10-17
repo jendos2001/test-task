@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 
-EXPOSE 8000
+EXPOSE ${ASR_PORT}
 
 
-CMD ["python3", "-m", "app.main"]
+CMD ["sh", "-c", "uvicorn app.main:app --host ${HOST} --port ${ASR_PORT}"]

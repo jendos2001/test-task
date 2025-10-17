@@ -2,8 +2,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    HOST: str
-    TTS_PORT: int
     WS_PATH: str
     TTS_MODEL_NAME: str
     CHUNK_MS: int
