@@ -66,6 +66,7 @@ async def tts_stream_from_text(
                             evt = payload.get("type")
                             if evt == "end":
                                 logger.info(event="TTS end signal received")
+                                yield json.dumps({"type": "end"}).encode("utf-8")
                                 break
                         except Exception:
                             logger.info(event="TTS text error")
@@ -73,8 +74,7 @@ async def tts_stream_from_text(
                     elif msg.type in (aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.ERROR):
                         logger.info(event=f"TTS WS closed or error ({msg.type})")
                         break
-
-                await ws.close()
+            await ws.close()
 
     except asyncio.TimeoutError:
         logger.error(event="TTS websocket timeout")

@@ -34,7 +34,7 @@ async def ws_tts_proxy(ws: WebSocket):
                 continue
 
             if "text" in payload.keys():
-                texts = {"text": payload["text"]}
+                texts = [{"text": payload["text"]}]
             elif "segments" in payload.keys() and isinstance(payload["segments"], list):
                 texts = payload["segments"]
             else:

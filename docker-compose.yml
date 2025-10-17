@@ -25,6 +25,7 @@ services:
     build:
       context: ./tts-service
       dockerfile: Dockerfile
+    container_name: tts
     networks:
       - speech_net
     volumes:
