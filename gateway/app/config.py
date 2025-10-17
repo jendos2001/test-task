@@ -12,6 +12,5 @@ class Settings(BaseSettings):
     REQUEST_TIMEOUT: int
     LOG_LEVEL: str
 
-
     class Config:
         env_file = ".env"

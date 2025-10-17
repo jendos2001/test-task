@@ -10,7 +10,12 @@ from .engine import call_asr, tts_stream_from_text
 
 
 settings = Settings()
-logger = MyLogger(settings.LOG_DIR, settings.LOG_FILE_INFO, settings.LOG_FILE_ERROR, settings.LOG_LEVEL)
+logger = MyLogger(
+    settings.LOG_DIR,
+    settings.LOG_FILE_INFO,
+    settings.LOG_FILE_ERROR,
+    settings.LOG_LEVEL,
+)
 app = FastAPI()
 
 
@@ -29,7 +34,7 @@ async def ws_tts_proxy(ws: WebSocket):
                 continue
 
             if "text" in payload.keys():
-                texts = {"text": payload["text"]}
+                texts = [{"text": payload["text"]}]
             elif "segments" in payload.keys() and isinstance(payload["segments"], list):
                 texts = payload["segments"]
             else:
@@ -39,12 +44,14 @@ async def ws_tts_proxy(ws: WebSocket):
 
             for text in texts:
                 try:
-                    async for chunk in tts_stream_from_text(logger, settings.TTS_WS_URL, text, settings.REQUEST_TIMEOUT):
+                    async for chunk in tts_stream_from_text(
+                        logger, settings.TTS_WS_URL, text, settings.REQUEST_TIMEOUT
+                    ):
                         await ws.send_bytes(chunk)
                 except Exception:
-                    logger.error(event=f"TTS stream error")
+                    logger.error(event="TTS stream error")
                     await ws.send_json({"Error": "TTS stream error"})
-    
+
     except WebSocketDisconnect:
         logger.error(event="Client websocket disconnected")
     except Exception as e:
@@ -53,6 +60,7 @@ async def ws_tts_proxy(ws: WebSocket):
             await ws.close(code=1011)
         except Exception:
             pass
+
 
 @app.post("/api/echo-bytes")
 async def echo_bytes(request: Request):
@@ -71,16 +79,27 @@ async def echo_bytes(request: Request):
         raise HTTPException(status_code=400, detail="Empty audio")
 
     try:
-        asr_resp = await call_asr(logger, f"http://asr:{settings.ASR_PORT}", raw, sr, ch, fmt, settings.REQUEST_TIMEOUT)
+        asr_resp = await call_asr(
+            logger,
+            f"http://asr:{settings.ASR_PORT}",
+            raw,
+            sr,
+            ch,
+            fmt,
+            settings.REQUEST_TIMEOUT,
+        )
     except Exception as e:
         logger.error(event=f"ASR error: {e}")
         raise HTTPException(status_code=502, detail="ASR error")
 
-
     has_segments = False
     segments = []
 
-    if "segments" in asr_resp and isinstance(asr_resp["segments"], list) and len(asr_resp["segments"]) > 0:
+    if (
+        "segments" in asr_resp
+        and isinstance(asr_resp["segments"], list)
+        and len(asr_resp["segments"]) > 0
+    ):
         segments = asr_resp["segments"]
         has_segments = True
     elif "text" in asr_resp and asr_resp.get("text"):
@@ -98,7 +117,9 @@ async def echo_bytes(request: Request):
                     result = segment
                 if not result.get("text"):
                     continue
-                async for chunk in tts_stream_from_text(logger, settings.TTS_WS_URL, result, settings.REQUEST_TIMEOUT):
+                async for chunk in tts_stream_from_text(
+                    logger, settings.TTS_WS_URL, result, settings.REQUEST_TIMEOUT
+                ):
                     yield chunk
         except asyncio.CancelledError:
             logger.info(event="Client disconnected during streaming")
@@ -107,5 +128,4 @@ async def echo_bytes(request: Request):
             logger.error(event=f"TTS streaming error: {e}")
             return
 
-
-    return StreamingResponse(streamer(), media_type='audio/L16')
+    return StreamingResponse(streamer(), media_type="audio/L16")
